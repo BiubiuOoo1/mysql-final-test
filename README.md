@@ -204,6 +204,7 @@ mysql> SELECT * FROM t_table2 WHERE Hiredate = (SELECT MAX(Hiredate) FROM t_tabl
 1 row in set (0.00 sec)
 ```
 **入职时间最短的人为WangYijian。**
+
 3.3 有几种职位（job字段）？在关系代数中，本操作是什么运算？
 ```sql
 mysql> select distinct job
@@ -230,6 +231,7 @@ mysql> select found_rows();
 ```
 **job字段中有6个职位
 在关系代数中，本操作是 选择运算**
+
 3.4 将 MILLER 的 comm 增加 100； 然后，找到 comm 比 MILLER 低的人；
 ```sql
 mysql> select ename from t_table2 WHERE sal>(
@@ -331,31 +333,46 @@ mysql> select t1.ename My_b_b_name,t2.ename My_b_name ,t3.ename My_name
 ```
 3.7 建立一个视图：每个人的empno, ename, job 和 loc。简述为什么要建立本视图。
 ```sql
-mysql> create view view01
-    -> AS
-    -> SELECT empno,ename,job
-    -> FROM t_table2;
-Query OK, 0 rows affected (0.02 sec)
+mysql> select * from t_table1 t1 inner join t_table2 t2 on t1.deptno=t2.deptno;
++--------+------------+----------+----------+------------+-----------+------+------------+--------+------+--------+
+| deptno | dname      | loc      | empno    | ename      | job       | MGR  | Hiredate   | salary | comm | deptno |
++--------+------------+----------+----------+------------+-----------+------+------------+--------+------+--------+
+|     20 | RESEARCH   | DALLAS   |     7369 | SMITH      | CLERK     | 7902 | 1981-03-12 |    800 | NULL |     20 |
+|     30 | SALES      | CHICAGO  |     7499 | ALLEN      | SALESMAN  | 7698 | 1982-03-12 |   1600 |  300 |     30 |
+|     30 | SALES      | CHICAGO  |     7521 | WARD       | SALESMAN  | 7698 | 1838-03-12 |   1250 |  500 |     30 |
+|     20 | RESEARCH   | DALLAS   |     7566 | JONES      | MANAGER   | 7839 | 1981-03-12 |   2975 | NULL |     20 |
+|     30 | SALES      | CHICAGO  |     7654 | MARTIN     | SALESMAN  | 7698 | 1981-01-12 |   1250 | 1400 |     30 |
+|     10 | ACCOUNTING | NEW YORK |     7698 | BLAKE      | MANAGER   | 7839 | 1985-03-12 |   2450 | NULL |     10 |
+|     20 | RESEARCH   | DALLAS   |     7788 | SCOTT      | ANALYST   | 7566 | 1981-03-12 |   3000 | NULL |     20 |
+|     10 | ACCOUNTING | NEW YORK |     7839 | KING       | PRESIDENT | NULL | 1981-03-12 |   5000 | NULL |     10 |
+|     30 | SALES      | CHICAGO  |     7844 | TURNER     | SALESMAN  | 7689 | 1981-03-12 |   1500 |    0 |     30 |
+|     20 | RESEARCH   | DALLAS   |     7878 | ADAMS      | CLERK     | 7788 | 1981-03-12 |   1100 | NULL |     20 |
+|     30 | SALES      | CHICAGO  |     7900 | JAMES      | CLERK     | 7698 | 1981-03-12 |    950 | NULL |     30 |
+|     20 | RESEARCH   | DALLAS   |     7902 | FORD       | ANALYST   | 7566 | 1981-03-12 |   3000 | NULL |     20 |
+|     10 | ACCOUNTING | NEW YORK |     7934 | MILLER     | CLERK     | 7782 | 1981-03-12 |   1300 |  100 |     10 |
+|     10 | ACCOUNTING | NEW YORK | 17061524 | WangYijian | stduent   | 7788 | 1999-04-23 |   NULL | NULL |     10 |
++--------+------------+----------+----------+------------+-----------+------+------------+--------+------+--------+
+14 rows in set (0.01 sec)
 
-mysql> select*from view01;
-+----------+------------+-----------+
-| empno    | ename      | job       |
-+----------+------------+-----------+
-|     7369 | SMITH      | CLERK     |
-|     7499 | ALLEN      | SALESMAN  |
-|     7521 | WARD       | SALESMAN  |
-|     7566 | JONES      | MANAGER   |
-|     7654 | MARTIN     | SALESMAN  |
-|     7698 | BLAKE      | MANAGER   |
-|     7788 | SCOTT      | ANALYST   |
-|     7839 | KING       | PRESIDENT |
-|     7844 | TURNER     | SALESMAN  |
-|     7878 | ADAMS      | CLERK     |
-|     7900 | JAMES      | CLERK     |
-|     7902 | FORD       | ANALYST   |
-|     7934 | MILLER     | CLERK     |
-| 17061524 | WangYijian | stduent   |
-+----------+------------+-----------+
+mysql> select empno,ename,job,loc from t_table1 t1 inner join t_table2 t2 on t1.deptno=t2.deptno;
++----------+------------+-----------+----------+
+| empno    | ename      | job       | loc      |
++----------+------------+-----------+----------+
+|     7369 | SMITH      | CLERK     | DALLAS   |
+|     7499 | ALLEN      | SALESMAN  | CHICAGO  |
+|     7521 | WARD       | SALESMAN  | CHICAGO  |
+|     7566 | JONES      | MANAGER   | DALLAS   |
+|     7654 | MARTIN     | SALESMAN  | CHICAGO  |
+|     7698 | BLAKE      | MANAGER   | NEW YORK |
+|     7788 | SCOTT      | ANALYST   | DALLAS   |
+|     7839 | KING       | PRESIDENT | NEW YORK |
+|     7844 | TURNER     | SALESMAN  | CHICAGO  |
+|     7878 | ADAMS      | CLERK     | DALLAS   |
+|     7900 | JAMES      | CLERK     | CHICAGO  |
+|     7902 | FORD       | ANALYST   | DALLAS   |
+|     7934 | MILLER     | CLERK     | NEW YORK |
+| 17061524 | WangYijian | stduent   | NEW YORK |
++----------+------------+-----------+----------+
 14 rows in set (0.00 sec)
 ```
 **建立视图可以只看到视图中定义的数据，而不是表中的数据，提高了数据库中数据的安全性**
