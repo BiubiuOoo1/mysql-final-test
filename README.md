@@ -493,6 +493,7 @@ mysql> SELECT Host,User,Select_priv,Grant_priv
 `
 with grant option可以将select ,update权限授权给第三方。
 `
+
 5 表 1 和表 2 这样设计是否符合第一范式，是否符合第二范式，为什么？
 
 `
