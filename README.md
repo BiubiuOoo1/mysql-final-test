@@ -293,24 +293,42 @@ mysql>  select found_rows();
 +--------------+
 1 row in set (0.00 sec)
 
-mysql> select ename,salary+comm,count(ename) counts,AVG(salary+comm) average_salary_comm from t_table2;
+mysql> select ename,sal+comm,count(ename) counts,AVG(sal+comm) average_sal_comm from t_table2;
 +-------+-------------+--------+---------------------+
-| ename | salary+comm | counts | average_salary_comm |
+| ename |  sal+comm   | counts | average_salary_comm |
 +-------+-------------+--------+---------------------+
 | SMITH |        NULL |     14 |                1840 |
 +-------+-------------+--------+---------------------+
 1 row in set (0.00 sec)
 
-mysql> select ename,coalesce(salary+comm,0),count(ename),coalesce(AVG(salary+comm),0) from t_table2;
+mysql> select ename,coalesce(sal+comm,0),count(ename),coalesce(AVG(sal+comm),0) from t_table2;
 +-------+-------------------------+--------------+------------------------------+
-| ename | coalesce(salary+comm,0) | count(ename) | coalesce(AVG(salary+comm),0) |
+| ename |   coalesce(sal+comm,0)  | count(ename) |   coalesce(AVG(sal+comm),0)  |
 +-------+-------------------------+--------------+------------------------------+
 | SMITH |                       0 |           14 |                         1840 |
 +-------+-------------------------+--------------+------------------------------+
 1 row in set (0.00 sec)
 ```
 3.6 显示每个人的下属, 没有下属的显示 NULL。本操作使用关系代数中哪几种运算？
-
+```sql
+mysql> select t1.ename My_b_b_name,t2.ename My_b_name ,t3.ename My_name
+    -> from (t_table2 t1 inner join t_table2 t2 on t1. empno= t2. mgr)  inner join t_table2 t3
+    ->  on t2.empno = t3.mgr;
++-------------+-----------+------------+
+| My_b_b_name | My_b_name | My_name    |
++-------------+-----------+------------+
+| JONES       | FORD      | SMITH      |
+| KING        | BLAKE     | ALLEN      |
+| KING        | BLAKE     | WARD       |
+| KING        | BLAKE     | MARTIN     |
+| KING        | JONES     | SCOTT      |
+| JONES       | SCOTT     | ADAMS      |
+| KING        | BLAKE     | JAMES      |
+| KING        | JONES     | FORD       |
+| JONES       | SCOTT     | WangYijian |
++-------------+-----------+------------+
+9 rows in set (0.01 sec)
+```
 3.7 建立一个视图：每个人的empno, ename, job 和 loc。简述为什么要建立本视图。
 ```sql
 mysql> create view view01
@@ -344,8 +362,30 @@ mysql> select*from view01;
 3.8 为表2增加一个约束：deptno字段需要在表1中存在；这称做什么完整性？
 
 3.9 为表2增加一个索引：ename 字段。简述为什么要在 ename 字段建立索引
+```sql
+mysql> CREATE INDEX index_ename
+    -> ON t_table2 (ename);
+Query OK, 0 rows affected (0.04 sec)
+Records: 0  Duplicates: 0  Warnings: 0
 
-答：
+mysql> SHOW CREATE TABLE t_table2 \G
+*************************** 1. row ***************************
+       Table: t_table2
+Create Table: CREATE TABLE `t_table2` (
+  `empno` int(11) NOT NULL,
+  `ename` varchar(20) DEFAULT NULL,
+  `job` varchar(20) DEFAULT NULL,
+  `MGR` int(11) DEFAULT NULL,
+  `Hiredate` date DEFAULT NULL,
+  `salary` float DEFAULT NULL,
+  `comm` float DEFAULT NULL,
+  `deptno` int(11) NOT NULL,
+  PRIMARY KEY (`empno`),
+  KEY `index_ename` (`ename`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1
+1 row in set (0.00 sec)
+```
+**建立索引可以提高查找速度**
 3.10 将表2的 sal 字段改名为 salary
 ```sql
 mysql> alter table t_table2
