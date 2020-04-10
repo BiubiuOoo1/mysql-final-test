@@ -376,7 +376,14 @@ mysql> select empno,ename,job,loc from t_table1 t1 inner join t_table2 t2 on t1.
 14 rows in set (0.00 sec)
 ```
 **建立视图的目的：为了提高复杂SQL语句的复用性和表操作的安全性,MySQL数据库管理系统提供了视图特性。视图并不在数据库中以存储的数据值形式存在。行和列数据来自定义视图的查询所引用基本表，并且在具体引用视图时动态生成。视图使程序员只关心感兴趣的某些特定数据和他们所负责的特定任务。这样程序员只能看到视图中所定义的数据，而不是视图所引用表中的数据，从而提高了数据库中数据的安全性。**
+
 3.8 为表2增加一个约束：deptno字段需要在表1中存在；这称做什么完整性？
+```SQL
+
+```
+`
+这是实体完整性
+`
 
 3.9 为表2增加一个索引：ename 字段。简述为什么要在 ename 字段建立索引
 ```sql
@@ -403,6 +410,7 @@ Create Table: CREATE TABLE `t_table2` (
 1 row in set (0.00 sec)
 ```
 **建立索引可以提高查找速度**
+
 3.10 将表2的 sal 字段改名为 salary
 ```sql
 mysql> alter table t_table2
@@ -426,9 +434,44 @@ mysql> desc t_table2;
 8 rows in set (0.00 sec)
 ```
 3.11 撰写一个函数 get_deptno_from_empno，输入 empno，输出对应的 deptno。 简述函数和存储过程有什么不同。
+```sql
+mysql> DELIMITER $$
+mysql> CREATE FUNCTION get_deptno_from_empno (empno INT)
+    -> RETURNS DOUBLE
+    -> BEGIN
+    -> RETURN (SELECT deptno FROM t_table2
+    -> WHERE t_table2.empno = empno);
+    -> END$$
+Query OK, 0 rows affected (0.04 sec)
+
+mysql> DELIMITER ;
+mysql> SELECT get_deptno_from_empno (7844);
++-------------------------------+
+| get_deptno_from_empno  (7844) |
++-------------------------------+
+|                            30 |
++-------------------------------+
+1 row in set (0.01 sec)
+```
+`
+不同：
+1.存储过程可以返回参数，函数只能返回值或者表对象
+2.函数只能返回一个变量，存储过程可以返回多个变量
+3.存储过程可以有三种,OUT,INOUT 类型，函数中必须包含一个有效的RETURN语句
+4.存储过程一般是作为一个独立部分来执行的（EXECUTE语句执行），函数可以作为查询语句的一个部分来调用（SELECT)
+`
 
 4 建立一个新用户，账号为自己的姓名拼音，密码为自己的学号；
+```SQL
+mysql> GRANT USAGE ON *.* TO 'WangYijian'@'localhost' IDENTIFIED BY '17061524' WITH GRANT OPTION;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
 
+mysql> SET PASSWORD FOR WangYijian@'localhost' = PASSWORD('17061524');
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> FLUSH PRIVILEGES;
+Query OK, 0 rows affected (0.00 sec)
+```
 4.1 将表1的SELECT, INSERT, UPDATE(ename)权限赋给该账号。
 
 4.2 显示该账号权限
