@@ -194,6 +194,7 @@ mysql> SELECT*FROM t_table2;
 ```
 3.2 表中入职时间（Hiredate字段）最短的人。
 
+
 3.3 有几种职位（job字段）？在关系代数中，本操作是什么运算？
 
 3.4 将 MILLER 的 comm 增加 100； 然后，找到 comm 比 MILLER 低的人；
@@ -208,6 +209,7 @@ mysql> SELECT*FROM t_table2;
 
 3.9 为表2增加一个索引：ename 字段。简述为什么要在 ename 字段建立索引
 
+答：
 3.10 将表2的 sal 字段改名为 salary
 
 3.11 撰写一个函数 get_deptno_from_empno，输入 empno，输出对应的 deptno。 简述函数和存储过程有什么不同。
