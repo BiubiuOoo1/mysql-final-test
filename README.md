@@ -489,7 +489,9 @@ mysql> SELECT Host,User,Select_priv,Grant_priv
 1 row in set (0.00 sec)
 ```
 4.3 `with grant option` 是什么意思。
-
+`
+with grant option可以将select ,update权限授权给第三方。
+`
 5 表 1 和表 2 这样设计是否符合第一范式，是否符合第二范式，为什么？
 `
 表一符合第一范式和第二范式。表一的关系中的每个属性不可再分，满足第一范式；表中的一个属性确定了其他的属性也随之确定，满足第二范式。
