@@ -193,12 +193,74 @@ mysql> SELECT*FROM t_table2;
 14 rows in set (0.00 sec)
 ```
 3.2 表中入职时间（Hiredate字段）最短的人。
-
-
+```sql
+mysql> SELECT * FROM t_table2 WHERE Hiredate = (SELECT MAX(Hiredate) FROM t_table2);
++----------+------------+---------+------+------------+------+------+--------+
+| empno    | ename      | job     | MGR  | Hiredate   | sal  | comm | deptno |
++----------+------------+---------+------+------------+------+------+--------+
+| 17061524 | WangYijian | stduent | 7788 | 1999-04-23 | NULL | NULL |     10 |
++----------+------------+---------+------+------------+------+------+--------+
+1 row in set (0.00 sec)
+```
+**入职时间最短的人为WangYijian。**
 3.3 有几种职位（job字段）？在关系代数中，本操作是什么运算？
+```sql
+mysql> select distinct job
+    -> from t_table2;
++-----------+
+| job       |
++-----------+
+| CLERK     |
+| SALESMAN  |
+| MANAGER   |
+| ANALYST   |
+| PRESIDENT |
+| stduent   |
++-----------+
+6 rows in set (0.00 sec)
 
+mysql> select found_rows();
++--------------+
+| found_rows() |
++--------------+
+|            6 |
++--------------+
+1 row in set (0.01 sec)
+```
+**job字段中有6个职位
+在关系代数中，本操作是 选择运算**
 3.4 将 MILLER 的 comm 增加 100； 然后，找到 comm 比 MILLER 低的人；
+```sql
+mysql> select ename from t_table2 WHERE sal>(
+    -> select sal+100 from t_table2 WHERE ename='MILLER');
++--------+
+| ename  |
++--------+
+| ALLEN  |
+| JONES  |
+| BLAKE  |
+| SCOTT  |
+| KING   |
+| TURNER |
+| FORD   |
++--------+
+7 rows in set (0.01 sec)
 
+mysql> select * from t_table2 WHERE sal>(
+    -> select sal+100 from t_table2 WHERE ename='MILLER');
++-------+--------+-----------+------+------------+------+------+--------+
+| empno | ename  | job       | MGR  | Hiredate   | sal  | comm | deptno |
++-------+--------+-----------+------+------------+------+------+--------+
+|  7499 | ALLEN  | SALESMAN  | 7698 | 1982-03-12 | 1600 |  300 |     30 |
+|  7566 | JONES  | MANAGER   | 7839 | 1981-03-12 | 2975 | NULL |     20 |
+|  7698 | BLAKE  | MANAGER   | 7839 | 1985-03-12 | 2450 | NULL |     10 |
+|  7788 | SCOTT  | ANALYST   | 7566 | 1981-03-12 | 3000 | NULL |     20 |
+|  7839 | KING   | PRESIDENT | NULL | 1981-03-12 | 5000 | NULL |     10 |
+|  7844 | TURNER | SALESMAN  | 7689 | 1981-03-12 | 1500 |    0 |     30 |
+|  7902 | FORD   | ANALYST   | 7566 | 1981-03-12 | 3000 | NULL |     20 |
++-------+--------+-----------+------+------------+------+------+--------+
+7 rows in set (0.00 sec)
+```
 3.5 计算每个人的收入(ename, sal + comm)；计算总共有多少人；计算所有人的平均收入。 提示：计算时 NULL 要当做 0 处理； 
 
 3.6 显示每个人的下属, 没有下属的显示 NULL。本操作使用关系代数中哪几种运算？
