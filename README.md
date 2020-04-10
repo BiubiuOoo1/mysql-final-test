@@ -31,17 +31,18 @@ mysql> select now();
 ```
 2 组合打印自己的姓名和学号
 ```sql
-mysql> create table user1(
+mysql> create table me(
     -> name VARCHAR(20),
     -> id INT);
 Query OK, 0 rows affected (0.05 sec)
-mysql> select*from user1;
-+------+----------+
-| name | id       |
-+------+----------+
-| Wang | 17061524 |
-+------+----------+
-1 row in set (0.00 sec)
+
+mysql> select CONCAT('王逸健','+','17061524');
++---------------------------------+
+| CONCAT('王逸健','+','17061524') |
++---------------------------------+
+| 王逸健+17061524                 |
++---------------------------------+
+1 row in set (0.01 sec)
 ```
 (例如 张三+123456 或者 zhangsan+123456 显示需包含加号)，写出SQL语句和结果
 
@@ -262,18 +263,111 @@ mysql> select * from t_table2 WHERE sal>(
 7 rows in set (0.00 sec)
 ```
 3.5 计算每个人的收入(ename, sal + comm)；计算总共有多少人；计算所有人的平均收入。 提示：计算时 NULL 要当做 0 处理； 
+```sql
+mysql> select ename,sal+comm from t_table2;
++------------+----------+
+| ename      | sal+comm |
++------------+----------+
+| SMITH      |     NULL |
+| ALLEN      |     1900 |
+| WARD       |     1750 |
+| JONES      |     NULL |
+| MARTIN     |     2650 |
+| BLAKE      |     NULL |
+| SCOTT      |     NULL |
+| KING       |     NULL |
+| TURNER     |     1500 |
+| ADAMS      |     NULL |
+| JAMES      |     NULL |
+| FORD       |     NULL |
+| MILLER     |     1400 |
+| WangYijian |     NULL |
++------------+----------+
+14 rows in set (0.00 sec)
 
+mysql>  select found_rows();
++--------------+
+| found_rows() |
++--------------+
+|           14 |
++--------------+
+1 row in set (0.00 sec)
+
+mysql> select ename,salary+comm,count(ename) counts,AVG(salary+comm) average_salary_comm from t_table2;
++-------+-------------+--------+---------------------+
+| ename | salary+comm | counts | average_salary_comm |
++-------+-------------+--------+---------------------+
+| SMITH |        NULL |     14 |                1840 |
++-------+-------------+--------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> select ename,coalesce(salary+comm,0),count(ename),coalesce(AVG(salary+comm),0) from t_table2;
++-------+-------------------------+--------------+------------------------------+
+| ename | coalesce(salary+comm,0) | count(ename) | coalesce(AVG(salary+comm),0) |
++-------+-------------------------+--------------+------------------------------+
+| SMITH |                       0 |           14 |                         1840 |
++-------+-------------------------+--------------+------------------------------+
+1 row in set (0.00 sec)
+```
 3.6 显示每个人的下属, 没有下属的显示 NULL。本操作使用关系代数中哪几种运算？
 
 3.7 建立一个视图：每个人的empno, ename, job 和 loc。简述为什么要建立本视图。
+```sql
+mysql> create view view01
+    -> AS
+    -> SELECT empno,ename,job
+    -> FROM t_table2;
+Query OK, 0 rows affected (0.02 sec)
 
+mysql> select*from view01;
++----------+------------+-----------+
+| empno    | ename      | job       |
++----------+------------+-----------+
+|     7369 | SMITH      | CLERK     |
+|     7499 | ALLEN      | SALESMAN  |
+|     7521 | WARD       | SALESMAN  |
+|     7566 | JONES      | MANAGER   |
+|     7654 | MARTIN     | SALESMAN  |
+|     7698 | BLAKE      | MANAGER   |
+|     7788 | SCOTT      | ANALYST   |
+|     7839 | KING       | PRESIDENT |
+|     7844 | TURNER     | SALESMAN  |
+|     7878 | ADAMS      | CLERK     |
+|     7900 | JAMES      | CLERK     |
+|     7902 | FORD       | ANALYST   |
+|     7934 | MILLER     | CLERK     |
+| 17061524 | WangYijian | stduent   |
++----------+------------+-----------+
+14 rows in set (0.00 sec)
+```
+**建立视图可以只看到视图中定义的数据，而不是表中的数据，提高了数据库中数据的安全性**
 3.8 为表2增加一个约束：deptno字段需要在表1中存在；这称做什么完整性？
 
 3.9 为表2增加一个索引：ename 字段。简述为什么要在 ename 字段建立索引
 
 答：
 3.10 将表2的 sal 字段改名为 salary
+```sql
+mysql> alter table t_table2
+    -> change sal salary float;
+Query OK, 0 rows affected (0.02 sec)
+Records: 0  Duplicates: 0  Warnings: 0
 
+mysql> desc t_table2;
++----------+-------------+------+-----+---------+-------+
+| Field    | Type        | Null | Key | Default | Extra |
++----------+-------------+------+-----+---------+-------+
+| empno    | int(11)     | NO   | PRI | NULL    |       |
+| ename    | varchar(20) | YES  |     | NULL    |       |
+| job      | varchar(20) | YES  |     | NULL    |       |
+| MGR      | int(11)     | YES  |     | NULL    |       |
+| Hiredate | date        | YES  |     | NULL    |       |
+| salary   | float       | YES  |     | NULL    |       |
+| comm     | float       | YES  |     | NULL    |       |
+| deptno   | int(11)     | NO   |     | NULL    |       |
++----------+-------------+------+-----+---------+-------+
+8 rows in set (0.00 sec)
+```
 3.11 撰写一个函数 get_deptno_from_empno，输入 empno，输出对应的 deptno。 简述函数和存储过程有什么不同。
 
 4 建立一个新用户，账号为自己的姓名拼音，密码为自己的学号；
