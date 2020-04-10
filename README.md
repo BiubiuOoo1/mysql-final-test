@@ -463,20 +463,31 @@ mysql> SELECT get_deptno_from_empno (7844);
 
 4 建立一个新用户，账号为自己的姓名拼音，密码为自己的学号；
 ```SQL
-mysql> GRANT USAGE ON *.* TO 'WangYijian'@'localhost' IDENTIFIED BY '17061524' WITH GRANT OPTION;
-Query OK, 0 rows affected, 1 warning (0.01 sec)
-
-mysql> SET PASSWORD FOR WangYijian@'localhost' = PASSWORD('17061524');
-Query OK, 0 rows affected, 1 warning (0.00 sec)
-
-mysql> FLUSH PRIVILEGES;
+mysql> CREATE USER 'WangYijian'@'localhost' IDENTIFIED BY '17061524';
 Query OK, 0 rows affected (0.00 sec)
 ```
 
 4.1 将表1的SELECT, INSERT, UPDATE(ename)权限赋给该账号。
+```sql
+mysql> GRANT SELECT,INSERT ON *.*
+    -> TO 'WangYijian'@'localhost'
+    -> IDENTIFIED BY '17061524'
+    -> WITH GRANT OPTION;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+```
 
 4.2 显示该账号权限
-
+```sql
+mysql> SELECT Host,User,Select_priv,Grant_priv
+    -> FROM mysql.user
+    -> WHERE User='WangYijian';
++-----------+------------+-------------+------------+
+| Host      | User       | Select_priv | Grant_priv |
++-----------+------------+-------------+------------+
+| localhost | WangYijian | Y           | Y          |
++-----------+------------+-------------+------------+
+1 row in set (0.00 sec)
+```
 4.3 `with grant option` 是什么意思。
 
 5 表 1 和表 2 这样设计是否符合第一范式，是否符合第二范式，为什么？
@@ -504,7 +515,23 @@ ACID含义
 8.1 编写一个事务，“将 MILLER 的 comm 增加 100，如果增加后的 comm 大于 1000 则回滚”；
 
 8.2 如何查看 MySQL 当前的隔离级别？
+```sql
+mysql> SELECT @@tx_isolation;
++-----------------+
+| @@tx_isolation  |
++-----------------+
+| REPEATABLE-READ |
++-----------------+
+1 row in set, 1 warning (0.00 sec)
+```
 
 8.3 如果隔离级别为 READ-UNCOMMITED, 完成 “MILLER 的 comm 增加 100” 事务操作完成后，可能读到的结果有哪些，原因是什么？
-
+`
+如果隔离级别为 READ-UNCOMMITED, 完成 “MILLER 的 comm 增加 100” 事务操作完成后，可能读到原先未提交的内容（1300），因为READ-UNCOMMITED为读取未提交内容
+`
 9 有哪些场景不适合用关系型数据库？为什么？
+`
+1.图片、文件、二进制数据对数据库的读/写的速度永远都赶不上文件系统处理的速度，数据库备份变的巨大，越来越耗时间，对文件的访问需要穿越你的应用层和数据库层
+2.短生命期数据使用情况统计数据，测量数据，GPS定位数据，session数据，任何只是短时间内对用户有用，或经常变化的数据。
+3.日志文件也许你的日志记录做的很保守，每次web请求只产生一条日志。 对于整个网站的每个事件来说，这仍然会产生大量的数据库插入操作，争夺用户需要的数据库资源。
+`
